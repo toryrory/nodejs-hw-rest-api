@@ -35,7 +35,7 @@ const deleteContact = async (req, res) => {
 
 const updateContact = async (req, res) => {
   const { contactId } = req.params;
-  const result = await Contact.findByIdAndUpdate(contactId, req.body, {new: true}); // что бы в Postman показывало обновленный обьект
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {new: true}); 
   if (!result) {
     throw httpError(404, "Not found");
   }

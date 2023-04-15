@@ -41,7 +41,6 @@ const updateSchema = Joi.object({
   name: Joi.string().optional(),
   email: Joi.string().optional(),
   phone: Joi.string().optional(),
-  favorite: Joi.boolean().optional(),
 }).required().min(1).error(new Error("missing fields"));
 
 const updateFavoriteSchema = Joi.object({
