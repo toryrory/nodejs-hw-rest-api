@@ -31,10 +31,7 @@ const addSchema = Joi.object({
     .error(new Error("missing required email field")),
   phone: Joi.string()
     .required()
-    .error(new Error("missing required phone field")),
-  favorite: Joi.boolean()
-    .required()
-    .error(new Error("missing required favorite field")),
+    .error(new Error("missing required phone field"))
 });
 
 const updateSchema = Joi.object({
