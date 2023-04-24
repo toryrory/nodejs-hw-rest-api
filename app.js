@@ -13,6 +13,7 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public')) // если прийдет запрос на файлы то с этой папки юзер сможет увидеть файл. (по дефолту любые файлы с расширением сервер не отображает что бы нельзя было раскрыть код сайта, через название файлов)
 
 app.use("/api/contacts", contactsRouter);
 app.use("/users", authRouter);
