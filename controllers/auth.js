@@ -18,7 +18,7 @@ const register = async (req, res) => {
     throw httpError(409, "Email in use");
   }
   const createHashPassword = await bcrypt.hash(password, 10);
-const avatarURL = gravatar.url(email);
+  const avatarURL = gravatar.url(email);
   const newUser = await User.create({
     ...req.body,
     password: createHashPassword,
@@ -66,23 +66,24 @@ const logout = async (req, res) => {
   res.status(204).json();
 };
 const updateSubscription = async (req, res) => {
-    const { _id } = req.user;
-    const result = await User.findByIdAndUpdate(_id, req.body, {
-      new: true,
-    }).select('subscription');
-res.json(result)
-}
+  const { _id } = req.user;
+  const result = await User.findByIdAndUpdate(_id, req.body, {
+    new: true,
+  }).select("subscription");
+  res.json(result);
+};
 const updateAvatar = async (req, res) => {
   const { _id } = req.user;
   const { path: tempPath, originalname } = req.file; // путь к временной папке
-  const fileName = `${_id}_${originalname}`;
+  const fileName = `xs_${_id}_${originalname}`;
   const resultUpload = path.join(avatarsDir, fileName); // путь к постоянной папке
+
   await fs.rename(tempPath, resultUpload); // перезаписываем место хранения файла на постоянное
-  const avatarURL = path.join("public", "avatars", fileName); 
+  const avatarURL = path.join("public", "avatars", fileName);
 
   const image = await Jimp.read(avatarURL);
-  image.resize(250, 250).write(`${avatarsDir}/xs_${fileName}`)
-  
+  image.resize(250, 250).write(avatarURL);
+
   await User.findByIdAndUpdate(_id, { avatarURL }); // записываем путь к фалу в БД
 
   res.json({
