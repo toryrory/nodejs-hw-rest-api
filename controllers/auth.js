@@ -4,6 +4,12 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = process.env;
 const { httpError, ctrlWrapper } = require("../helpers");
+const gravatar = require("gravatar"); // пакет который генерирует шаблонную аватарку
+const Jimp = require("jimp");
+const path = require("path");
+const fs = require("fs/promises");
+
+const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -12,10 +18,11 @@ const register = async (req, res) => {
     throw httpError(409, "Email in use");
   }
   const createHashPassword = await bcrypt.hash(password, 10);
-  console.log(createHashPassword);
+  const avatarURL = gravatar.url(email);
   const newUser = await User.create({
     ...req.body,
     password: createHashPassword,
+    avatarURL,
   });
 
   res.status(201).json({
@@ -59,12 +66,30 @@ const logout = async (req, res) => {
   res.status(204).json();
 };
 const updateSubscription = async (req, res) => {
-    const { _id } = req.user;
-    const result = await User.findByIdAndUpdate(_id, req.body, {
-      new: true,
-    }).select('subscription');
-res.json(result)
-}
+  const { _id } = req.user;
+  const result = await User.findByIdAndUpdate(_id, req.body, {
+    new: true,
+  }).select("subscription");
+  res.json(result);
+};
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: tempPath, originalname } = req.file; // путь к временной папке
+  const fileName = `xs_${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsDir, fileName); // путь к постоянной папке
+
+  await fs.rename(tempPath, resultUpload); // перезаписываем место хранения файла на постоянное
+  const avatarURL = path.join("public", "avatars", fileName);
+
+  const image = await Jimp.read(avatarURL);
+  image.resize(250, 250).write(avatarURL);
+
+  await User.findByIdAndUpdate(_id, { avatarURL }); // записываем путь к фалу в БД
+
+  res.json({
+    avatarURL,
+  });
+};
 
 module.exports = {
   register: ctrlWrapper(register),
@@ -72,4 +97,5 @@ module.exports = {
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
