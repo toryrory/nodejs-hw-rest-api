@@ -26,6 +26,14 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+    verify: { // верифицирован ли юзер
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: { // код подтверждения который будет приходить на почту
+      type: String,
+      default: '',
+    }
   },
   { versionKey: false, timestamps: false }
 );
@@ -54,10 +62,17 @@ const updateSubscriptionSchema = Joi.object({
   subscription: Joi.string().required().error(new Error("missing required subscription field")),
 });
 
+const verifySchema = Joi.object({
+  email: Joi.string()
+    .required()
+    // .error(new Error("missing required field email")),
+});
+
 const schemas = {
   registerSchema,
   loginSchema,
   updateSubscriptionSchema,
+  verifySchema,
 };
 
 module.exports = {

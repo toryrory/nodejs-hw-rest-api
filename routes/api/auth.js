@@ -7,6 +7,8 @@ const { schemas } = require("../../models/user");
 const ctrl = require("../../controllers/auth");
 
 router.post("/register", validateBody(schemas.registerSchema), ctrl.register);
+router.get("/verify/:verificationToken", ctrl.verification);
+router.post("/verify", validateBody(schemas.verifySchema), ctrl.repeatVerify);
 router.post("/login", validateBody(schemas.loginSchema), ctrl.login);
 router.get("/current", authenticate, ctrl.getCurrent);
 router.post("/logout", authenticate, ctrl.logout);
@@ -23,5 +25,6 @@ router.patch(
   upload.single("avatar"),
   ctrl.updateAvatar
 );
+
 
 module.exports = router;
